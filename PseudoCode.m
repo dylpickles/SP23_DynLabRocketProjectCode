@@ -11,6 +11,8 @@ Can you simply code each launch ...
 stage as it's own thing without ...
 needing recursion? 
 
+Hi Deryck
+
 Variables
 R_water = %density of water [kg/m^3]
 R_air = %density of atmospheric air [kg/m^3]
