@@ -56,12 +56,7 @@ Functions
 calculateMass - calculate mass m_rocket throughout flight by solving for
 momentum, rocket velocity calculated using stopwatch data and accelerometer
 data
-calculateVelocity - approximation for rocket velocity based on stopwatch
-and acceleratometer data
-calculate position - calculate position based on energy conservation
-calculate apogee - calculate maximum rocket height (where rocket velocity
-=0)
-
+calculateVelocity - approximation for rocket vel
 
 
 %}
