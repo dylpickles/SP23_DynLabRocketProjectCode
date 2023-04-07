@@ -21,7 +21,8 @@ mu = %friction coefficient
 m_rocket = %mass of empty bottle without water
 m_water = %mass of water in the bottle
 
-P_atm = %atmospheric pressure, [kPa]
+P_i = %internal pressure [kPa]
+P_atm = %atmospheric pressure [kPa]
 D_rocket = %diameter of the rocket
 A_rocket = %cross sectional area of rocket body [m^3]
 A_nozzle = %cross sectional area of rocket nozzle [m^3]
@@ -61,7 +62,5 @@ and acceleratometer data
 calculate position - calculate position based on energy conservation
 calculate apogee - calculate maximum rocket height (where rocket velocity
 =0)
-
-
 
 %}
