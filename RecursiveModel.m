@@ -55,9 +55,19 @@ function RecursiveModel(delta_t)
     gamma = 1.4 %
 
     %Changing variables 
-    persistent v_water = 0 %velocity of water moving inside of rocket body
-    persistent v_WR  = 0 %expulsion velocity of the water in relation to the rocket's nozzle
-    persistent m_rocket = 0; %total mass of rocket in CV [kg]
+    persistent v_water; %velocity of water moving inside of rocket body
+    persistent v_WR; %expulsion velocity of the water in relation to the rocket's nozzle
+    persistent m_rocket; %total mass of rocket in CV [kg]
+    
+    if isempty(v_water)
+        v_water = 0;
+    end
+    if isempty(v_WR)
+        v_water = 0;
+    end
+    if isempty(m_rocket)
+        m_rocket = 0;
+    end
 
     bool_waterleftinside = 1 %set to 0 when the mass of water in the 
     %rocket is below or equal to 0, this then should enable something 
@@ -98,7 +108,7 @@ function RecursiveModel(delta_t)
         P_int = 1;      %[kPa]
         m_water = 1;    %[kg]
         v_rocket = 0;    %[m/s]
-        m_water = 0;    %[m]
+        h = 0;    %[m]
 
         pARRAY = [pARRAY, P_int];
         mARRAY = [mARRAY, m_water];
@@ -125,7 +135,7 @@ function RecursiveModel(delta_t)
 end
 
 function [v_water, m_dot, V1] = initiation(m_water, v_rocket, P_int)
-    v_water = sqrt(2(P_int-P_atm)/(R_water(1-(A_nozzle/A_rocket)^2)));
+    v_water = sqrt(2*(P_int-P_atm)/(R_water(1-(A_nozzle/A_rocket)^2)));
     v_WR = A_nozzle*v_water/A_rocket;
     m_dot = R_water*A_nozzle*v_WR;
     V1 = V_bottle - m_water/R_water;
