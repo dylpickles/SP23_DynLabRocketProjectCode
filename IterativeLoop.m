@@ -111,6 +111,8 @@ function IterativeLoop(delta_t)
 
         %assessment
         F_thrust = -m_dot*v_WR+A_nozzle*(pARRAY(frame-1))*1000; %x1000 bc we're using kPa and need to be using Pa
+        %the "-" in front of the m_dot term is to unify the direction such
+        %that thrust is pointing upwards
         F_weight = m_rocket*g;
         F_drag = 1/2*R_air*vARRAY(frame-1)^2*C_d*A_rocket;
         
@@ -138,5 +140,5 @@ function IterativeLoop(delta_t)
     xlabel('Time (s)');
     ylabel('Position (m)');
     
-    max_height = max(hARRAY)*3.28*7
+    max_height = max(hARRAY)*3.28*7 %max height in feet, 7 is our BS factor
 end
