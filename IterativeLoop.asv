@@ -126,7 +126,7 @@ function IterativeLoop(delta_t)
 
         frame = frame + 1;
         
-        fprintf('Frame: %i |P: %fkPa|V: %fm/s|M: %fkg \n', frame, pARRAY(frame-1), vARRAY(frame-1), mARRAY(frame-1));
+        fprintf('Frame: %i |P: %fkPa|V: %fm/s|M: %fkg \n', frame, hARRAY(frame-1), hARRAY(frame));
     end
 
     plot(tARRAY, hARRAY);
