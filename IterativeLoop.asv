@@ -29,34 +29,37 @@ function IterativeLoop(delta_t)
      - maximum thrust force
      - position vs. time plots
     %}
-
-    %Constant variables, currently filled with dummy numbers
+    
+    %Flight 14 Data
+    %200	ml water
+    %20	psi launch pressure
+    %54 ft apogee
+    
+    %Setting initial conditions on the persistent arrays
+    P_int = 20*6.89476;      %internal pressure [kPa], converted from psi
+    v_rocket = 0;   %velocity of the rocket relative to a fixed frame [m/s]
+    h = 0;          %height [m]
+    V_water = 200/1000000; %for the test flight we care about
+    
+    %Constant variables
     R_water = 997;      %density of liquid water [kg/m^3]
     R_air =  1.293;     %density of atmospheric air [kg/m^3]
     C_d = 0.5;          %Drag coefficient [Unitless]
     g = 9.81;           %gravitational constant [m/s^2]
+    m_water = V_water*R_water; %mass of the water in the rocket [kg]
     
-    %Flight 14 Data
-    200	ml water
-    20	psi launch pressure
-    54 ft apogee
+    m_rocket = 0; %this is changing but dependent on m_water anyways
+    m_bottle = 0.198; %mass of empty bottle without water [kg]
+    V_bottle = 1250/1000000; %fillable volume of the empty bottle [m^3], 1250mL
     
-    m_rocket = 0.198; %this is changing but dependent on m_water anyways
-    m_bottle = 0; %mass of empty bottle without water [kg]
-    m_air = 0.25; %mass of empty bottle without water [kg]
-    V_bottle = 1250*/1000; %fillable volume of the empty bottle [m^3], 1250mL
+    m_air = (V_bottle-V_water)*R_air;
     
-    P_atm = 0.01; %atmospheric pressure [kPa]
+    P_atm = 101.325; %atmospheric pressure [kPa]
     D_rocket = 0.086; %diameter of the rocket [m]
     D_nozzle = 0.02; %diameter of the rocket [m]
     A_rocket = pi()*(D_rocket/2)^2; %cross sectional area of rocket body [m^3]
     A_nozzle = pi()*(D_nozzle/2)^2; %cross sectional area of rocket nozzle [m^3]
     gamma = 1.4; %
-    
-    %initial values, will be set in another scope
-    m_water = 0;   %mass of the water in the rocket [kg]
-    P_int = 0;      %internal pressure [kPa]
-    v_rocket = 0;   %velocity of the rocket relative to a fixed frame
     
     %these variables change but are derived from the other changing
     %variables. The values here are purely for initializing the variable.
@@ -87,12 +90,6 @@ function IterativeLoop(delta_t)
     if isempty(totalTime)
         totalTime = 0;
     end
-    
-    %Setting initial conditions on the persistent arrays
-    P_int = 1;      %[kPa]
-    m_water = 0.05; %[kg]
-    v_rocket = 0;   %[m/s]
-    h = 0;          %[m]
 
     pARRAY = [pARRAY, P_int];
     mARRAY = [mARRAY, m_water];
@@ -110,10 +107,10 @@ function IterativeLoop(delta_t)
         v_WR = A_nozzle*v_water/A_rocket;
         m_dot = R_water*A_nozzle*v_WR;
         V1 = V_bottle - m_water/R_water;
+        m_rocket = mARRAY(frame-1) + m_air + m_bottle;
 
         %assessment
         F_thrust = m_dot*v_water+A_nozzle*(pARRAY(frame-1)-P_atm);
-        m_rocket = mARRAY(frame-1) + m_air + m_bottle;
         F_weight = m_rocket*g;
         F_drag = 1/2*R_air*v_rocket^2*C_d*A_rocket;
 
@@ -131,7 +128,7 @@ function IterativeLoop(delta_t)
 
         frame = frame + 1;
         
-        fprintf('Frame: %i |P: %fkPa|V: %fm/s|M: %fkg \n', frame, pARRAY(frame-1), vARRAY(frame-1), mARRAY(frame-1));
+        fprintf('Frame: %i |P: %fkPa|V: %fm/s|M: %fkg \n', frame-1, pARRAY(frame-1), vARRAY(frame-1), mARRAY(frame-1));
     end
 
     plot(tARRAY, hARRAY);

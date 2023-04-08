@@ -56,7 +56,7 @@ function IterativeLoop(delta_t)
     
     P_atm = 101.325; %atmospheric pressure [kPa]
     D_rocket = 0.086; %diameter of the rocket [m]
-    D_nozzle = 0.02; %diameter of the rocket [m]
+    D_nozzle = 0.01; %diameter of the rocket [m]
     A_rocket = pi()*(D_rocket/2)^2; %cross sectional area of rocket body [m^3]
     A_nozzle = pi()*(D_nozzle/2)^2; %cross sectional area of rocket nozzle [m^3]
     gamma = 1.4; %
@@ -100,19 +100,21 @@ function IterativeLoop(delta_t)
     frame = 2;
 
     %loop until velocity < 0 
-    while vARRAY(frame-1)>=-10
+    while vARRAY(frame-1)>= -10 
         
         %initiation
-        v_water = sqrt(2*(pARRAY(frame-1)-P_atm)/(R_water*(1-(A_nozzle/A_rocket)^2)));
-        v_WR = A_nozzle*v_water/A_rocket;
-        m_dot = -R_water*A_nozzle*v_WR;
+        v_water = sqrt(2*(pARRAY(frame-1))/(R_water*(1-(A_nozzle/A_rocket)^2)));
+        v_WR = -A_nozzle*v_water/A_rocket;
+        m_dot = R_water*A_nozzle*v_WR;
         V1 = V_bottle - m_water/R_water;
+        m_rocket = mARRAY(frame-1) + m_air + m_bottle;
 
         %assessment
-        F_thrust = m_dot*v_water+A_nozzle*(pARRAY(frame-1)-P_atm);
-        m_rocket = mARRAY(frame-1) + m_air + m_bottle;
+        F_thrust = m_dot*v_water+A_nozzle*(pARRAY(frame-1));
         F_weight = m_rocket*g;
         F_drag = 1/2*R_air*v_rocket^2*C_d*A_rocket;
+        
+        fprintf('Frame: %i Forces |Thrust: %f|Weight: %fm/s|Drag: %fkg \n', frame-1, F_Thrust, F_weight, F_drag);
 
         %progression
         F_net = F_thrust - F_weight - F_drag;
@@ -128,7 +130,7 @@ function IterativeLoop(delta_t)
 
         frame = frame + 1;
         
-        fprintf('Frame: %i |P: %fkPa|V: %fm/s|M: %fkg \n', frame, pARRAY(frame-1), vARRAY(frame-1), mARRAY(frame-1));
+        fprintf('Frame: %i |P: %fkPa|V: %fm/s|M: %fkg \n', frame-1, pARRAY(frame-1), vARRAY(frame-1), mARRAY(frame-1));
     end
 
     plot(tARRAY, hARRAY);
