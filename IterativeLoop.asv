@@ -36,13 +36,18 @@ function IterativeLoop(delta_t)
     C_d = 0.5;          %Drag coefficient [Unitless]
     g = 9.81;           %gravitational constant [m/s^2]
     
-    m_rocket = 0; %this is changing but dependent on m_water anyways
+    %Flight 14 Data
+    200	ml water
+    20	psi launch pressure
+    54 ft apogee
+    
+    m_rocket = 0.198; %this is changing but dependent on m_water anyways
     m_bottle = 0; %mass of empty bottle without water [kg]
     m_air = 0.25; %mass of empty bottle without water [kg]
-    V_bottle = 0; %fillable volume of the empty bottle [m^3]
+    V_bottle = 1250*/1000; %fillable volume of the empty bottle [m^3], 1250mL
     
     P_atm = 0.01; %atmospheric pressure [kPa]
-    D_rocket = 0.1; %diameter of the rocket [m]
+    D_rocket = 0.086; %diameter of the rocket [m]
     D_nozzle = 0.02; %diameter of the rocket [m]
     A_rocket = pi()*(D_rocket/2)^2; %cross sectional area of rocket body [m^3]
     A_nozzle = pi()*(D_nozzle/2)^2; %cross sectional area of rocket nozzle [m^3]
@@ -126,7 +131,7 @@ function IterativeLoop(delta_t)
 
         frame = frame + 1;
         
-        fprintf('Frame: %i |P: %fkPa|V: %fm/s|M: %fkg \n', frame, hARRAY(frame-1), hARRAY(frame));
+        fprintf('Frame: %i |P: %fkPa|V: %fm/s|M: %fkg \n', frame, pARRAY(frame-1), vARRAY(frame-1), mARRAY(frame-1));
     end
 
     plot(tARRAY, hARRAY);
