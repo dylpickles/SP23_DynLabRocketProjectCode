@@ -36,10 +36,10 @@ function IterativeLoop(delta_t)
     %54 ft apogee
     
     %Setting initial conditions on the persistent arrays
-    P_int = 20*6.89476;      %internal pressure [kPa], converted from psi
+    P_int = 30*6.89476;      %internal pressure [kPa], converted from psi
     v_rocket = 0;   %velocity of the rocket relative to a fixed frame [m/s]
     h = 0;          %height [m]
-    V_water = 200/1000000; %for the test flight we care about
+    V_water = 150/1000000; %for the test flight we care about
     
     %Constant variables
     R_water = 997;      %density of liquid water [kg/m^3]
@@ -57,8 +57,8 @@ function IterativeLoop(delta_t)
     P_atm = 101.325; %atmospheric pressure [kPa]
     D_rocket = 0.086; %diameter of the rocket [m]
     D_nozzle = 0.01; %diameter of the rocket [m]
-    A_rocket = pi()*(D_rocket/2)^2; %cross sectional area of rocket body [m^3]
-    A_nozzle = pi()*(D_nozzle/2)^2; %cross sectional area of rocket nozzle [m^3]
+    A_rocket = pi()*(D_rocket/2)^2; %cross sectional area of rocket body [m^2]
+    A_nozzle = pi()*(D_nozzle/2)^2; %cross sectional area of rocket nozzle [m^2]
     gamma = 1.4; %
     
     %these variables change but are derived from the other changing
@@ -76,11 +76,11 @@ function IterativeLoop(delta_t)
     %persistent arrays for the values that we're looking to keep track of
     %by the end of the simulation and during each iteration for plotting
     %and analysis
-    persistent pARRAY;
-    persistent mARRAY;
-    persistent vARRAY;
-    persistent hARRAY;
-    persistent tARRAY;
+    pARRAY = [];
+    mARRAY = [];
+    vARRAY = [];
+    hARRAY = [];
+    tARRAY = [];
 
     if isempty(vARRAY)
         vARRAY(1) = 0;
@@ -100,21 +100,21 @@ function IterativeLoop(delta_t)
     frame = 2;
 
     %loop until velocity < 0 
-    while vARRAY(frame-1)>= -10 
+    while vARRAY(frame-1)>= -5 
         
         %initiation
         v_water = sqrt(2*(pARRAY(frame-1))/(R_water*(1-(A_nozzle/A_rocket)^2)));
-        v_WR = -A_nozzle*v_water/A_rocket;
-        m_dot = R_water*A_nozzle*v_WR;
+        v_WR = A_nozzle*v_water/A_rocket;
+        m_dot = -R_water*A_nozzle*v_WR;
         V1 = V_bottle - m_water/R_water;
         m_rocket = mARRAY(frame-1) + m_air + m_bottle;
 
         %assessment
-        F_thrust = m_dot*v_water+A_nozzle*(pARRAY(frame-1));
+        F_thrust = -m_dot*v_WR+A_nozzle*(pARRAY(frame-1))*1000; %x1000 bc we're using kPa and need to be using Pa
         F_weight = m_rocket*g;
-        F_drag = 1/2*R_air*v_rocket^2*C_d*A_rocket;
+        F_drag = 1/2*R_air*vARRAY(frame-1)^2*C_d*A_rocket;
         
-        fprintf('Frame: %i Forces |Thrust: %f|Weight: %fm/s|Drag: %fkg \n', frame-1, F_Thrust, F_weight, F_drag);
+        fprintf('Frame: %i Forces |Thrust: %f|Weight: %f|Drag: %f \n', frame, F_thrust, F_weight, F_drag);
 
         %progression
         F_net = F_thrust - F_weight - F_drag;
@@ -127,14 +127,16 @@ function IterativeLoop(delta_t)
 
         %timekeeping
         tARRAY(frame) = tARRAY(frame-1)+delta_t;
+        
+        fprintf('Frame: %i |P: %fkPa|V: %fm/s|M: %fkg |Time: %fs\n', frame, pARRAY(frame), vARRAY(frame), mARRAY(frame), tARRAY(frame));
 
         frame = frame + 1;
-        
-        fprintf('Frame: %i |P: %fkPa|V: %fm/s|M: %fkg \n', frame-1, pARRAY(frame-1), vARRAY(frame-1), mARRAY(frame-1));
     end
-
+    
     plot(tARRAY, hARRAY);
     title('Cool Rocket Simulation');
     xlabel('Time (s)');
     ylabel('Position (m)');
+    
+    max_height = max(hARRAY)*3.28*7
 end
