@@ -100,12 +100,12 @@ function IterativeLoop(delta_t)
     frame = 2;
 
     %loop until velocity < 0 
-    while vARRAY(frame-1)>=0
+    while vARRAY(frame-1)>=-10
         
         %initiation
         v_water = sqrt(2*(pARRAY(frame-1)-P_atm)/(R_water*(1-(A_nozzle/A_rocket)^2)));
         v_WR = A_nozzle*v_water/A_rocket;
-        m_dot = R_water*A_nozzle*v_WR;
+        m_dot = -R_water*A_nozzle*v_WR;
         V1 = V_bottle - m_water/R_water;
 
         %assessment
