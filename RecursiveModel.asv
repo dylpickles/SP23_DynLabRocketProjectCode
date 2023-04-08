@@ -15,6 +15,15 @@ function RecursiveModel(delta_t)
     %before we compile and run it, as opposed to having the overall functiona
     %call include conditions bc as a re
 
+    %The variable values here serve no purpose beyond holding space
+    P_int = 0;      %internal pressure [kPa]
+    m_water = 0;    %mass of the water in the rocket [kg]
+    v_rocket = 0;   %velocity of the rocket relative to a fixed frame
+
+    F_thrust = 0;   %thrust force on the rocket
+    F_weight = 0;   %thrust force on the rocket
+    F_drag = 0;     %thrust force on the rocket
+
     %{
     Your final report should present your results from the semester. 
     At a minimum, your report should include experimental and 
@@ -36,32 +45,30 @@ function RecursiveModel(delta_t)
     C_d = 0.5 %Drag coefficient [Unitless]
     g = 9.81 %gravitational constant [m/s^2]
     
-    m_rocket = 0; %this is changing but dependent on m_water anyways
     m_bottle = 0; %mass of empty bottle without water [kg]
-    m_air = 0.25 %mass of empty bottle without water [kg]
     V_bottle = 0; %fillable volume of the empty bottle [m^3]
-    
     P_atm = 0.01; %atmospheric pressure [kPa]
-    D_rocket = 0.1; %diameter of the rocket [m]
-    D_nozzle = 0.02; %diameter of the rocket [m]
-    A_rocket = pi()*(D_rocket/2)^2; %cross sectional area of rocket body [m^3]
-    A_nozzle = pi()*(D_nozzle/2)^2; %cross sectional area of rocket nozzle [m^3]
-    gamma = 1.4; %
+    D_rocket = 0.1 %diameter of the rocket [m]
+    D_nozzle = 0.02 %diameter of the rocket [m]
+    A_rocket = pi()*(D_rocket/2)^2%cross sectional area of rocket body [m^3]
+    A_nozzle = pi()*(D_nozzle/2)^2%cross sectional area of rocket nozzle [m^3]
+    gamma = 1.4 %
+
+    %Changing variables 
+    persistent v_water; %velocity of water moving inside of rocket body
+    persistent v_WR; %expulsion velocity of the water in relation to the rocket's nozzle
+    persistent m_rocket; %total mass of rocket in CV [kg]
     
-    %initial values, will be set in another scope
-    m_water; 
-    m_water = 0;   %mass of the water in the rocket [kg]
-    P_int = 0;      %internal pressure [kPa]
-    v_rocket = 0;   %velocity of the rocket relative to a fixed frame
-    
-    %these variables change but are derived from the other changing
-    %variables. The values here are purely for initializing the variable.
-    v_water = 0;    %velocity of water moving inside of rocket body
-    v_WR = 0;       %expulsion velocity of the water in relation to the rocket's nozzle
-    F_thrust = 0;   %thrust force on the rocket
-    F_weight = 0;   %thrust force on the rocket
-    F_drag = 0;     %thrust force on the rocket
-    
+    if isempty(v_water)
+        v_water = 0;
+    end
+    if isempty(v_WR)
+        v_water = 0;
+    end
+    if isempty(m_rocket)
+        m_rocket = 0;
+    end
+
     bool_waterleftinside = true; %set to 0 when the mass of water in the 
     %rocket is below or equal to 0, this then should enable something 
     %later to start decreasing air mass
@@ -125,7 +132,6 @@ function RecursiveModel(delta_t)
         %Initiating recursion
         RecursiveModel(delta_t);
     end
-end
 
 function [v_water, m_dot, V1] = initiation(m_water, v_rocket, P_int)
     v_water = sqrt(2*(P_int-P_atm)/(R_water*(1-(A_nozzle/A_rocket)^2)));
@@ -148,4 +154,6 @@ function [m_water, v_rocket, P_int] = progression(F_thrust, F_weight, F_drag, V1
     next_m_rocket = m_water + m_air + m_bottle; %using updated m_water value
     v_rocket = (m_rocket*v_rocket + F_net*delta_t)/next_m_rocket;
     P_int = P_int*(V1/V2)^gamma
+end
+
 end

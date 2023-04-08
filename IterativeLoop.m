@@ -86,66 +86,56 @@ function RecursiveModel(delta_t)
     
     persistent count;
     if isempty(count)
-        count = 1;
+        count = 0;
     end
 
-    if (vARRAY(count) < 0)
-        plot(tARRAY, hARRAY);
-        title('Cool Rocket Simulation');
-        xlabel('Time (s)');
-        ylabel('Position (m)');
-        
-        clear RecursiveModel;
-    elseif(isempty(pARRAY)||isempty(mARRAY)||isempty(vARRAY)||isempty(hARRAY))
-        %Setting initial conditions on the persistent arrays
-        P_int = 1;      %[kPa]
-        m_water = 1;    %[kg]
-        v_rocket = 0;    %[m/s]
-        h = 0;    %[m]
+    %loop until velocity < 0 
+    while (!(vARRAY(count)<0)) 
+        if (count = 0)
+            %Setting initial conditions on the persistent arrays
+            P_int = 1;      %[kPa]
+            m_water = 1;    %[kg]
+            v_rocket = 0;   %[m/s]
+            h = 0;          %[m]
 
-        pARRAY = [pARRAY, P_int];
-        mARRAY = [mARRAY, m_water];
-        vARRAY = [vARRAY, v_rocket];
-        hARRAY = [hARRAY, h];
-        tARRAY = [tARRAY, totalTime];
-        
-        RecursiveModel(delta_t);
-    else
-        % Calling our sub-functions
-        [v_water, m_dot, V1] = initiation(mARRAY(count), vARRAY(count), pARRAY(count));
-        [F_thrust, F_weight, F_drag] = assessment(v_water);
-        [mARRAY(count+1), vARRAY(count+1), pARRAY(count+1)] = progression(F_thrust, F_weight, F_drag, V1);
-        hARRAY(count+1) = vARRAY(count+1)*delta_t;
+            pARRAY = [pARRAY, P_int];
+            mARRAY = [mARRAY, m_water];
+            vARRAY = [vARRAY, v_rocket];
+            hARRAY = [hARRAY, h];
+            tARRAY = [tARRAY, 0];
+        elseif (count > 0)
+            %initiation
+            v_water = sqrt(2*(pARRAY(count)-P_atm)/(R_water*(1-(A_nozzle/A_rocket)^2)));
+            v_WR = A_nozzle*v_water/A_rocket;
+            m_dot = R_water*A_nozzle*v_WR;
+            V1 = V_bottle - m_water/R_water;
 
-        totalTime = delta_t + totalTime;
-        tARRAY = [tARRAY, totalTime];
-        
-        count = count + 1;
-        
-        %Initiating recursion
-        RecursiveModel(delta_t);
+            %assessment
+            F_thrust = m_dot*v_water+A_nozzle*(pARRAY(count)-P_atm);
+            m_rocket = mARRAY(count) + m_air + m_bottle;
+            F_weight = m_rocket*g;
+            F_drag = 1/2*R_air*v_rocket^2*C_d*A_rocket;
+
+            %progression
+            F_net = F_thrust - F_weight - F_drag;
+            mARRAY(count+1) = mARRAY(count) + m_dot*delta_t;
+            V2 = V_bottle - mARRAY(count+1)/R_water;
+            next_m_rocket = mARRAY(count+1) + m_air + m_bottle; %using updated m_water value
+            vARRAY(count+1) = (m_rocket*vARRAY(count)+ F_net*delta_t)/next_m_rocket;
+            pARRAY(count+1) = pARRAY(count)*(V1/V2)^gamma
+            hARRAY(count+1) = vARRAY(count)*delta_t;
+
+            %timekeeping
+            tARRAY(count+1) = tARRAY(count)+delta_t;
+
+            count = count + 1;
+        else
+            disp('uh oh');
+        end
     end
-end
 
-function [v_water, m_dot, V1] = initiation(m_water, v_rocket, P_int)
-    v_water = sqrt(2*(P_int-P_atm)/(R_water*(1-(A_nozzle/A_rocket)^2)));
-    v_WR = A_nozzle*v_water/A_rocket;
-    m_dot = R_water*A_nozzle*v_WR;
-    V1 = V_bottle - m_water/R_water;
-end
-
-function [F_thrust, F_weight, F_drag] = assessment(v_water)
-    F_thrust = m_dot*v_water+A_nozzle*(P_int-P_atm);
-    m_rocket = m_water + m_air + m_bottle;
-    F_weight = m_rocket*g;
-    F_drag = 1/2*R_air*v_rocket^2*C_d*A_rocket;
-end
-
-function [m_water, v_rocket, P_int] = progression(F_thrust, F_weight, F_drag, V1)
-    F_net = F_thrust - F_weight - F_drag;
-    m_water = m_water + m_dot*delta_t;
-    V2 = V_bottle - m_water/R_water;
-    next_m_rocket = m_water + m_air + m_bottle; %using updated m_water value
-    v_rocket = (m_rocket*v_rocket + F_net*delta_t)/next_m_rocket;
-    P_int = P_int*(V1/V2)^gamma
+    plot(tARRAY, hARRAY);
+    title('Cool Rocket Simulation');
+    xlabel('Time (s)');
+    ylabel('Position (m)');
 end
