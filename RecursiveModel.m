@@ -47,7 +47,7 @@ function RecursiveModel(delta_t)
     m_bottle = 0; %mass of empty bottle without water [kg]
     V_bottle = 0; %fillable volume of the empty bottle [kg]
     m_air = 0.25 %mass of empty bottle without water [kg]
-    P_atm = 0.01 %atmospheric pressure [kPa]
+    P_atm = 0.01; %atmospheric pressure [kPa]
     D_rocket = 0.1 %diameter of the rocket [m]
     D_nozzle = 0.02 %diameter of the rocket [m]
     A_rocket = pi()*(D_rocket/2)^2%cross sectional area of rocket body [m^3]
@@ -69,7 +69,7 @@ function RecursiveModel(delta_t)
         m_rocket = 0;
     end
 
-    bool_waterleftinside = 1 %set to 0 when the mass of water in the 
+    bool_waterleftinside = true; %set to 0 when the mass of water in the 
     %rocket is below or equal to 0, this then should enable something 
     %later to start decreasing air mass
 
