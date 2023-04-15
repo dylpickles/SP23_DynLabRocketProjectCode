@@ -1,33 +1,6 @@
 
 % This is a function that models the flight dynamics for water bottle 
-% rockets
-
-%Gonna first test out how hard it'll be to write as an iterative functino
-% recursive function
-%We can write a
-
-%Keep iterating the code while rocket has positive velocity
-
-%Preassigning values to
-%The 3 key variables that will persist, water mass, rocket velocity, and 
-%internal bottle pressure
-%we can set the conditions for the simulation inside the code
-%before we compile and run it, as opposed to having the overall functiona
-%call include conditions bc as a re
-
-%{
-Your final report should present your results from the semester. 
-At a minimum, your report should include experimental and 
-theoretical comparisons for: peak altitude, thrust duration, 
-maximum thrust force, and position vs. time plots.  
-Project submission requires
- - peak altitude
-    need a persistent height matrix
- - thrust duration
-    will need
- - maximum thrust force
- - position vs. time plots
-%}
+% rockets. It continues iterating while rocket has positive velocity
 
 %Flight 14 Data
 %200	ml water
